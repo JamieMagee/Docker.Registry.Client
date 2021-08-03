@@ -24,21 +24,6 @@ namespace Docker.Registry.DotNet
             this.Host = host;
         }
 
-        /// <summary>
-        ///     Obsolete constructor that allows a uri to be used to specify a registry.
-        /// </summary>
-        /// <param name="endpoint"></param>
-        /// <param name="defaultTimeout"></param>
-        [Obsolete("Use the constructor that allows you to specify a host.")]
-        public RegistryClientConfiguration(Uri endpoint, TimeSpan defaultTimeout = default)
-            : this(defaultTimeout)
-        {
-            if (endpoint == null)
-                throw new ArgumentNullException(nameof(endpoint));
-
-            this.EndpointBaseUri = endpoint;
-        }
-
         private RegistryClientConfiguration(TimeSpan defaultTimeout)
         {
             if (defaultTimeout != TimeSpan.Zero)
