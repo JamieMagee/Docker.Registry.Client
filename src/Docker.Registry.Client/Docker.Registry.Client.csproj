@@ -1,0 +1,35 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+    <PropertyGroup>
+        <DocumentationFile>bin\$(Configuration)\$(TargetFramework)\$(AssemblyName).xml</DocumentationFile>
+        <RepositoryType>git</RepositoryType>
+        <NoWarn>1701;1702;1591</NoWarn>
+        <Version>1.1.0</Version>
+        <TargetFramework>netstandard2.0</TargetFramework>
+    </PropertyGroup>
+
+    <PropertyGroup>
+        <PackageVersion>$(Version)</PackageVersion>
+        <Authors>Rich Quackenbush</Authors>
+        <Description>Docker.DotNet is a library that allows you to interact with the Docker Registry API V2 programmatically with fully asynchronous, non-blocking and object-oriented code in your .NET applications.</Description>
+        <PackageIconUrl>https://raw.githubusercontent.com/ChangemakerStudios/Docker.Registry.DotNet/master/assets/docker_registry_dotnet.png</PackageIconUrl>
+        <PackageId>Docker.Registry.Client</PackageId>
+        <PackageProjectUrl>https://github.com/ChangemakerStudios/Docker.Registry.DotNet</PackageProjectUrl>
+        <RepositoryUrl>https://github.com/ChangemakerStudios/Docker.Registry.DotNet</RepositoryUrl>
+        <PackageReleaseNotes>Added Basic Authentication (thanks Zguy). Fixed issue with operational parameters (thanks lostllama). Fixed issue with large manifest layers (thanks msvprogs).</PackageReleaseNotes>
+        <RepositoryType>git</RepositoryType>
+        <PackageLicenseFile>LICENSE</PackageLicenseFile>
+        <PackageTags>docker registry .net C# client</PackageTags>
+    </PropertyGroup>
+
+    <ItemGroup>
+        <PackageReference Include="JetBrains.Annotations" Version="2020.1.0" />
+        <PackageReference Include="Newtonsoft.Json" Version="11.0.2" />
+        <PackageReference Include="System.IdentityModel.Tokens.Jwt" Version="5.1.0" />
+        <PackageReference Include="System.ValueTuple" Version="4.4.0" />
+        <PackageReference Include="System.Buffers" Version="4.4.0" />
+    </ItemGroup>
+  
+    <ItemGroup>
+        <None Include="../../LICENSE" Pack="true" PackagePath="" />
+    </ItemGroup>
+</Project>
