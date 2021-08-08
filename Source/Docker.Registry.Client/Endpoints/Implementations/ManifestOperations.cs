@@ -2,6 +2,7 @@
 {
     using System;
     using System.Collections.Generic;
+    using System.Net;
     using System.Net.Http;
     using System.Runtime.Serialization;
     using System.Threading;
@@ -74,13 +75,43 @@
             }
         }
 
+        /// <inheritdoc />
+        public async Task<bool> DoesManifestExistAsync(string name, string reference, CancellationToken cancellationToken = default)
+        {
+            var headers = new Dictionary<string, string>
+            {
+                {
+                    "Accept",
+                    $"{ManifestMediaTypes.ManifestSchema1}, {ManifestMediaTypes.ManifestSchema2}, {ManifestMediaTypes.ManifestList}, {ManifestMediaTypes.ManifestSchema1Signed}"
+                },
+            };
+
+            RegistryApiResponse<string> response;
+
+            try
+            {
+                response = await this._client.MakeRequestAsync(
+                    cancellationToken,
+                    HttpMethod.Head,
+                    $"v2/{name}/manifests/{reference}",
+                    null,
+                    headers).ConfigureAwait(false);
+            }
+            catch (RegistryApiException e)
+            {
+                if (e.StatusCode == HttpStatusCode.NotFound)
+                {
+                    return false;
+                }
+
+                throw;
+            }
+
+            return response.StatusCode == HttpStatusCode.OK;
+        }
+
         //public Task PutManifestAsync(string name, string reference, ImageManifest manifest,
         //    CancellationToken cancellationToken = default)
-        //{
-        //    throw new NotImplementedException();
-        //}
-
-        //public Task<bool> DoesManifestExistAsync(string name, string reference, CancellationToken cancellation = default)
         //{
         //    throw new NotImplementedException();
         //}

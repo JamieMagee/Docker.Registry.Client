@@ -6,7 +6,7 @@
 
     public abstract class DockerHubBaseTest
     {
-        protected readonly IRegistryClient client;
+        internal readonly IRegistryClient client;
 
         protected DockerHubBaseTest()
         {

@@ -23,14 +23,14 @@
             string reference,
             CancellationToken cancellationToken = default);
 
-        ///// <summary>
-        ///// Returns true if the image exists, false otherwise.
-        ///// </summary>
-        ///// <param name="name"></param>
-        ///// <param name="reference"></param>
-        ///// <param name="cancellation"></param>
-        ///// <returns></returns>
-        //Task<bool> DoesManifestExistAsync(string name, string reference, CancellationToken cancellation = default);
+        /// <summary>
+        /// Returns true if the image exists, false otherwise.
+        /// </summary>
+        /// <param name="name"></param>
+        /// <param name="reference"></param>
+        /// <param name="cancellation"></param>
+        /// <returns></returns>
+        Task<bool> DoesManifestExistAsync(string name, string reference, CancellationToken cancellation = default);
 
         ///// <summary>
         ///// Put the manifest identified by name and reference where reference can be a tag or digest.
