@@ -5,7 +5,7 @@ VisualStudioVersion = 16.0.30413.136
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Docker.Registry.Client", "Source\Docker.Registry.Client\Docker.Registry.Client.csproj", "{4E407B44-8D47-4C72-AC8E-6FCB9DBF7CC9}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Docker.Registry.Client.Tests", "Tests\Docker.Registry.Client.Tests\Docker.Registry.Client.Tests.csproj", "{DB3EDE19-27D5-4BBE-842A-614755576BE4}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Docker.Registry.Client.Tests.Unit", "Tests\Docker.Registry.Client.Tests.Unit\Docker.Registry.Client.Tests.Unit.csproj", "{DB3EDE19-27D5-4BBE-842A-614755576BE4}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Source", "Source", "{CEF0C705-6F68-422A-B286-61AE0861DD58}"
 ProjectSection(SolutionItems) = preProject
@@ -57,6 +57,8 @@ ProjectSection(SolutionItems) = preProject
 	.github\workflows\codeql-analysis.yml = .github\workflows\codeql-analysis.yml
 EndProjectSection
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Docker.Registry.Client.Tests.Integration", "Tests\Docker.Registry.Client.Tests.Integration\Docker.Registry.Client.Tests.Integration.csproj", "{81E10096-197A-463E-8829-31DD2354BD67}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -71,6 +73,10 @@ Global
 		{DB3EDE19-27D5-4BBE-842A-614755576BE4}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{DB3EDE19-27D5-4BBE-842A-614755576BE4}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{DB3EDE19-27D5-4BBE-842A-614755576BE4}.Release|Any CPU.Build.0 = Release|Any CPU
+		{81E10096-197A-463E-8829-31DD2354BD67}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{81E10096-197A-463E-8829-31DD2354BD67}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{81E10096-197A-463E-8829-31DD2354BD67}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{81E10096-197A-463E-8829-31DD2354BD67}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -81,6 +87,7 @@ Global
 		{0E87D845-3C58-4B46-8E44-9BD224561747} = {357AEEE6-A803-411C-BB44-FD58971162FB}
 		{0B913296-1B59-4D7B-B63C-48FE0D7217F9} = {7AB5357F-DB89-41C0-85B6-E176AB65DD6E}
 		{604EDEEC-6E76-4795-BAC0-3C0B713B470B} = {0B913296-1B59-4D7B-B63C-48FE0D7217F9}
+		{81E10096-197A-463E-8829-31DD2354BD67} = {239E2C2D-A7A2-4EDD-B2CC-A929924CCB0F}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {9001024B-B865-4E2D-A0D5-812683BF066F}
