@@ -4,11 +4,11 @@
     using Authentication;
     using Registry;
 
-    public class DockerHubBaseTest
+    public abstract class DockerHubBaseTest
     {
         protected readonly IRegistryClient client;
 
-        public DockerHubBaseTest()
+        protected DockerHubBaseTest()
         {
             var authentication = new PasswordOAuthAuthenticationProvider(
                 Environment.GetEnvironmentVariable(Constants.DockerHubUsernameEnvironmentVariable),

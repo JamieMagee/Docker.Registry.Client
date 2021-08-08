@@ -5,7 +5,7 @@
   </PropertyGroup>
 
   <ItemGroup Label="Project References">
-    <ProjectReference Include="..\..\Source\Docker.Registry.Client\Docker.Registry.Client.csproj"/>
+    <ProjectReference Include="..\..\Source\Docker.Registry.Client\Docker.Registry.Client.csproj" />
   </ItemGroup>
 
 </Project>
