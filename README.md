@@ -1,21 +1,20 @@
-# <img src="https://github.com/ChangemakerStudios/Docker.Registry.DotNet/raw/master/assets/docker_registry_dotnet.png" width="24" height="24" /> Docker.Registry.DotNet
+# Docker.Registry.Client
 
-[![NuGet version](https://badge.fury.io/nu/Docker.Registry.DotNet.svg)](https://badge.fury.io/nu/Docker.Registry.DotNet) [![Build status](https://ci.appveyor.com/api/projects/status/n8pemuwbqkr3vipu?svg=true)](https://ci.appveyor.com/project/Jaben/docker-registry-dotnet) [![Downloads](https://img.shields.io/nuget/dt/Docker.Registry.DotNet.svg?logo=nuget&color=purple)](https://www.nuget.org/packages/Docker.Registry.DotNet)
+![Nuget](https://img.shields.io/nuget/v/Docker.Registry.Client?style=for-the-badge)
+![GitHub Workflow Status (branch)](https://img.shields.io/github/workflow/status/JamieMagee/Docker.Registry.Client/build/main?style=for-the-badge)
 
-.NET (C#) Client Library for interacting with a Docker Registry API (v2 only).
+A .NET client library for interacting with a Docker Registry API (v2 only).
 
-# Setup
-*Install nuget package into your project via powershell:*
-```powershell
-PM> Install-Package Docker.Registry.DotNet
+## Setup
+
+Add via the dotnet CLI:
+
+```
+dotnet add package Docker.Registry.Client
 ```
 
-*Add nuget package via dotnet CLI:*
-```
-dotnet add package Docker.Registry.DotNet
-```
+## Usage
 
-# Usage
 ```csharp
 var configuration = new RegistryClientConfiguration("localhost:5000");
 
