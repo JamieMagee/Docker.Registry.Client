@@ -8,19 +8,28 @@
     {
         private readonly Dictionary<string, string[]> _values = new();
 
-        public string GetQueryString() => string.Join(
-            "&",
-            this._values.Select(
-                pair => string.Join(
-                    "&",
-                    pair.Value.Select(
-                        v => $"{Uri.EscapeUriString(pair.Key)}={Uri.EscapeDataString(v)}"))));
-
-        public void Add(string key, string value) => this._values.Add(key, new[]
+        public string GetQueryString()
         {
-            value
-        });
+            return string.Join(
+                "&",
+                this._values.Select(
+                    pair => string.Join(
+                        "&",
+                        pair.Value.Select(
+                            v => $"{Uri.EscapeUriString(pair.Key)}={Uri.EscapeDataString(v)}"))));
+        }
 
-        public void Add(string key, string[] values) => this._values.Add(key, values);
+        public void Add(string key, string value)
+        {
+            this._values.Add(key, new[]
+            {
+                value,
+            });
+        }
+
+        public void Add(string key, string[] values)
+        {
+            this._values.Add(key, values);
+        }
     }
 }

@@ -12,18 +12,10 @@
                 pair => string.Join(
                     "&",
                     pair.Value.Select(
-                        v => $"{Uri.EscapeUriString(pair.Key)}={Uri.EscapeDataString(v)}"))));
+                        v => $"{Uri.EscapeDataString(pair.Key)}={Uri.EscapeDataString(v)}"))));
 
         public static TValue GetValueOrDefault<TKey, TValue>(
             this IDictionary<TKey, TValue> dict,
-            TKey key)
-        {
-            if (dict.TryGetValue(key, out var value))
-            {
-                return value;
-            }
-
-            return default;
-        }
+            TKey key) => dict.TryGetValue(key, out var value) ? value : default;
     }
 }

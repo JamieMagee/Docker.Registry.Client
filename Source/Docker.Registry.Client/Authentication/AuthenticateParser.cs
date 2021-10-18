@@ -4,13 +4,15 @@
     using System.Collections.Generic;
     using System.Linq;
     using System.Text;
-    using Helpers;
+    using Docker.Registry.Client.Helpers;
 
-    internal static class AuthenticateParser
+    public static class AuthenticateParser
     {
-        public static IDictionary<string, string> Parse(string value) =>
+        public static IDictionary<string, string> Parse(string value)
+        {
             //https://stackoverflow.com/questions/45516717/extracting-and-parsing-the-www-authenticate-header-from-httpresponsemessage-in/45516809#45516809
-            SplitWWWAuthenticateHeader(value).ToDictionary(GetKey, GetValue);
+            return SplitWWWAuthenticateHeader(value).ToDictionary(GetKey, GetValue);
+        }
 
         private static IEnumerable<string> SplitWWWAuthenticateHeader(string value)
         {

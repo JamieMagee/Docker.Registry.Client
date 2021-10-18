@@ -16,7 +16,6 @@
         /// item is a JSON blob that the runtime uses to set up the container. This new schema uses a tweaked
         /// version of this configuration to allow image content-addressability on the daemon side.
         /// </summary>
-
         [DataMember(Name = "config")]
         public Config Config { get; set; }
 

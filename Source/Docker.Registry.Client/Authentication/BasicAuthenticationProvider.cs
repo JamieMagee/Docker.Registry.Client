@@ -22,7 +22,10 @@
 
         private static string Schema { get; } = "Basic";
 
-        public override Task AuthenticateAsync(HttpRequestMessage request) => Task.CompletedTask;
+        public override Task AuthenticateAsync(HttpRequestMessage request)
+        {
+            return Task.CompletedTask;
+        }
 
         public override Task AuthenticateAsync(
             HttpRequestMessage request,

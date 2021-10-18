@@ -1,6 +1,6 @@
 ﻿namespace Docker.Registry.Client.Models
 {
-    public class GetImageManifestResult
+    public record GetImageManifestResult
     {
         internal GetImageManifestResult(string mediaType, ImageManifest manifest, string content)
         {

@@ -2,8 +2,7 @@
 {
     using System;
     using System.Reflection;
-    using JetBrains.Annotations;
-    using QueryParameters;
+    using Docker.Registry.Client.QueryParameters;
 
     internal static class QueryStringExtensions
     {
@@ -14,7 +13,7 @@
         /// <typeparam name="T"></typeparam>
         /// <param name="queryString"></param>
         /// <param name="instance"></param>
-        internal static void AddFromObjectWithQueryParameters<T>(this QueryString queryString, [NotNull] T instance)
+        internal static void AddFromObjectWithQueryParameters<T>(this IQueryString queryString, T instance)
             where T : class
         {
             if (instance == null)
@@ -45,7 +44,7 @@
         /// <param name="queryString"></param>
         /// <param name="key"></param>
         /// <param name="value"></param>
-        internal static void AddIfNotNull<T>(this QueryString queryString, string key, T? value)
+        internal static void AddIfNotNull<T>(this IQueryString queryString, string key, T? value)
             where T : struct
         {
             if (value != null)
@@ -59,7 +58,7 @@
         /// <param name="queryString"></param>
         /// <param name="key"></param>
         /// <param name="value"></param>
-        internal static void AddIfNotEmpty(this QueryString queryString, string key, string value)
+        internal static void AddIfNotEmpty(this IQueryString queryString, string key, string value)
         {
             if (!string.IsNullOrWhiteSpace(value))
             {

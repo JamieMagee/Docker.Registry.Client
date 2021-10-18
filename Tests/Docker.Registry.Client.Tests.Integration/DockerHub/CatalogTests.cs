@@ -1,12 +1,11 @@
 ﻿namespace Docker.Registry.Client.Tests.Integration.DockerHub
 {
     using System.Threading.Tasks;
-    using Attributes;
     using Xunit;
 
-    public class CatalogTests : DockerHubBaseTest
+    public class CatalogTests : TestBase
     {
-        [SkipIfMissingEnvironmentVariable(Constants.DockerHubTokenEnvironmentVariable)]
+        [Fact]
         public async Task GetCatalogAsync()
         {
             var exception = await Record.ExceptionAsync(() => this.client.Catalog.GetCatalogAsync());

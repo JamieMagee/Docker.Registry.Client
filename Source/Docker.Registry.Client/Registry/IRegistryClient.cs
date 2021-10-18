@@ -1,7 +1,7 @@
 ﻿namespace Docker.Registry.Client.Registry
 {
     using System;
-    using Endpoints;
+    using Docker.Registry.Client.Endpoints;
     using JetBrains.Annotations;
 
     /// <summary>
@@ -10,31 +10,37 @@
     public interface IRegistryClient : IDisposable
     {
         /// <summary>
-        /// Manifest operations
+        /// Manifest operations.
         /// </summary>
         [PublicAPI]
         IManifestOperations Manifest { get; }
 
         /// <summary>
-        /// Catalog operations
+        /// Catalog operations.
         /// </summary>
         [PublicAPI]
         ICatalogOperations Catalog { get; }
 
         /// <summary>
-        /// Blog operations
+        /// Blog operations.
         /// </summary>
         [PublicAPI]
         IBlobOperations Blobs { get; }
 
         /// <summary>
-        /// Tag operations
+        /// Blog operations.
+        /// </summary>
+        [PublicAPI]
+        IBlobUploadOperations BlobUploads { get; }
+
+        /// <summary>
+        /// Tag operations.
         /// </summary>
         [PublicAPI]
         ITagOperations Tags { get; }
 
         /// <summary>
-        /// System operations
+        /// System operations.
         /// </summary>
         [PublicAPI]
         ISystemOperations System { get; }

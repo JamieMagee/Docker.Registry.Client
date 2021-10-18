@@ -3,8 +3,8 @@
     using System.Net.Http;
     using System.Net.Http.Headers;
     using System.Threading.Tasks;
+    using Docker.Registry.Client.OAuth;
     using JetBrains.Annotations;
-    using OAuth;
 
     [PublicAPI]
     public class PasswordOAuthAuthenticationProvider : AuthenticationProvider
@@ -31,19 +31,22 @@
         {
             var header = this.TryGetSchemaHeader(response, Schema);
 
-            //Get the bearer bits
+            // Get the bearer bits
             var bearerBits = AuthenticateParser.ParseTyped(header.Parameter);
 
-            //Get the token
+            // Get the token
             var token = await this._client.GetTokenAsync(
                 bearerBits.Realm,
                 bearerBits.Service,
                 bearerBits.Scope,
                 this._username,
-                this._password);
+                this._password)
+                .ConfigureAwait(false);
 
-            //Set the header
-            request.Headers.Authorization = new AuthenticationHeaderValue(Schema, token.Token);
+            // Set the header
+            request.Headers.Authorization = new AuthenticationHeaderValue(Schema, this.GetToken(token));
         }
+
+        internal virtual string GetToken(OAuthToken token) => token.Token;
     }
 }

@@ -1,7 +1,7 @@
 ﻿namespace Docker.Registry.Client.Models
 {
+    using Docker.Registry.Client.QueryParameters;
     using JetBrains.Annotations;
-    using QueryParameters;
 
     [PublicAPI]
     public class CatalogParameters

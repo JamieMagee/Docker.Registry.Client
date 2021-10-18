@@ -1,4 +1,4 @@
-﻿namespace Docker.Registry.Client.Tests.Integration.DockerHub
+﻿namespace Docker.Registry.Client.Tests.Integration.MicrosoftContainerRegistry
 {
     using System.Threading.Tasks;
     using Xunit;

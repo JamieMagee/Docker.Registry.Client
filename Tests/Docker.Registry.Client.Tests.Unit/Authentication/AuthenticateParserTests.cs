@@ -1,4 +1,4 @@
-﻿namespace Docker.Registry.Client.Tests.Authentication
+﻿namespace Docker.Registry.Client.Tests.Unit.Authentication
 {
     using Docker.Registry.Client.Authentication;
     using Xunit;

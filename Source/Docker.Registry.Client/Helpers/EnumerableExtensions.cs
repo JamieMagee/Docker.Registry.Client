@@ -5,6 +5,9 @@
 
     public static class EnumerableExtensions
     {
-        public static IEnumerable<T> IfNullEmpty<T>(this IEnumerable<T> enumerable) => enumerable ?? Enumerable.Empty<T>();
+        public static IEnumerable<T> IfNullEmpty<T>(this IEnumerable<T> enumerable)
+        {
+            return enumerable ?? Enumerable.Empty<T>();
+        }
     }
 }

@@ -2,22 +2,24 @@
 {
     using System;
     using System.Net.Http;
+    using System.Text.Json;
     using System.Threading;
     using System.Threading.Tasks;
-    using Helpers;
-    using JetBrains.Annotations;
-    using Models;
-    using Registry;
+    using Docker.Registry.Client.Models;
+    using Docker.Registry.Client.Registry;
 
     internal class TagOperations : ITagOperations
     {
-        private readonly NetworkClient _client;
+        private readonly NetworkClient client;
 
-        public TagOperations([NotNull] NetworkClient client) => this._client = client ?? throw new ArgumentNullException(nameof(client));
+        public TagOperations(NetworkClient client)
+        {
+            this.client = client;
+        }
 
         public async Task<ListImageTagsResponse> ListImageTagsAsync(
             string name,
-            ListImageTagsParameters parameters = null,
+            ListImageTagsParameters parameters = default,
             CancellationToken cancellationToken = default)
         {
             if (string.IsNullOrEmpty(name))
@@ -27,20 +29,15 @@
                     nameof(name));
             }
 
-            parameters = parameters ?? new ListImageTagsParameters();
+            var request = new RequestBuilder()
+                .WithHttpMethod(HttpMethod.Get)
+                .WithPath($"v2/{name}/tags/list")
+                .WithQueryString(parameters ?? new ListImageTagsParameters())
+                .Build();
 
-            var queryString = new QueryString();
+            var response = await this.client.MakeRequestAsync(request, cancellationToken).ConfigureAwait(false);
 
-            queryString.AddFromObjectWithQueryParameters(parameters);
-
-            var response = await this._client.MakeRequestAsync(
-                cancellationToken,
-                HttpMethod.Get,
-                $"v2/{name}/tags/list",
-                queryString).ConfigureAwait(false);
-
-            return this._client.JsonSerializer.DeserializeObject<ListImageTagsResponse>(
-                response.Body);
+            return JsonSerializer.Deserialize<ListImageTagsResponse>(response.Body);
         }
     }
 }

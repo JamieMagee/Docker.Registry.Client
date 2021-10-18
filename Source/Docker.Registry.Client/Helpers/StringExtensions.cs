@@ -7,6 +7,9 @@
     {
         public static string ToDelimitedString(
             this IEnumerable<string> strings,
-            string delimiter = "") => string.Join(delimiter, strings.IfNullEmpty().ToArray());
+            string delimiter = "")
+        {
+            return string.Join(delimiter, strings.IfNullEmpty().ToArray());
+        }
     }
 }

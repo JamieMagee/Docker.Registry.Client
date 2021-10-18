@@ -1,6 +1,6 @@
 ﻿namespace Docker.Registry.Client.Authentication
 {
-    internal class ParsedAuthentication
+    public class ParsedAuthentication
     {
         public ParsedAuthentication(string realm, string service, string scope)
         {

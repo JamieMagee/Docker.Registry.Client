@@ -5,19 +5,22 @@
     using System.Net;
     using System.Net.Http;
     using System.Runtime.Serialization;
+    using System.Text.Json;
     using System.Threading;
     using System.Threading.Tasks;
-    using Helpers;
+    using Docker.Registry.Client.Helpers;
+    using Docker.Registry.Client.Models;
+    using Docker.Registry.Client.Registry;
     using JetBrains.Annotations;
-    using Models;
-    using Newtonsoft.Json;
-    using Registry;
 
     internal class ManifestOperations : IManifestOperations
     {
-        private readonly NetworkClient _client;
+        private readonly NetworkClient client;
 
-        public ManifestOperations(NetworkClient client) => this._client = client;
+        public ManifestOperations(NetworkClient client)
+        {
+            this.client = client;
+        }
 
         public async Task<GetImageManifestResult> GetManifestAsync(
             string name,
@@ -29,50 +32,50 @@
                 {
                     "Accept",
                     $"{ManifestMediaTypes.ManifestSchema1}, {ManifestMediaTypes.ManifestSchema2}, {ManifestMediaTypes.ManifestList}, {ManifestMediaTypes.ManifestSchema1Signed}"
-                }
+                },
             };
 
-            var response = await this._client.MakeRequestAsync(
-                cancellationToken,
-                HttpMethod.Get,
-                $"v2/{name}/manifests/{reference}",
-                null,
-                headers).ConfigureAwait(false);
+            var request = new RequestBuilder()
+                .WithHttpMethod(HttpMethod.Get)
+                .WithPath($"v2/{name}/manifests/{reference}")
+                .WithHeaders(headers)
+                .Build();
+
+            var response = await this.client.MakeRequestAsync(request, cancellationToken).ConfigureAwait(false);
 
             var contentType = this.GetContentType(response.GetHeader("ContentType"), response.Body);
 
-            switch (contentType)
+            return contentType switch
             {
-                case ManifestMediaTypes.ManifestSchema1:
-                case ManifestMediaTypes.ManifestSchema1Signed:
-                    return new GetImageManifestResult(
-                        contentType,
-                        this._client.JsonSerializer.DeserializeObject<ImageManifest2_1>(
-                            response.Body),
-                        response.Body)
-                    {
-                        DockerContentDigest = response.GetHeader("Docker-Content-Digest"), Etag = response.GetHeader("Etag")
-                    };
-
-                case ManifestMediaTypes.ManifestSchema2:
-                    return new GetImageManifestResult(
-                        contentType,
-                        this._client.JsonSerializer.DeserializeObject<ImageManifest2_2>(
-                            response.Body),
-                        response.Body)
-                    {
-                        DockerContentDigest = response.GetHeader("Docker-Content-Digest")
-                    };
-
-                case ManifestMediaTypes.ManifestList:
-                    return new GetImageManifestResult(
-                        contentType,
-                        this._client.JsonSerializer.DeserializeObject<ManifestList>(response.Body),
-                        response.Body);
-
-                default:
-                    throw new Exception($"Unexpected ContentType '{contentType}'.");
-            }
+                ManifestMediaTypes.ManifestSchema1 => new GetImageManifestResult(
+                    contentType,
+                    JsonSerializer.Deserialize<ImageManifest2_1>(response.Body),
+                    response.Body)
+                {
+                    DockerContentDigest = response.GetHeader("Docker-Content-Digest"),
+                    Etag = response.GetHeader("Etag"),
+                },
+                ManifestMediaTypes.ManifestSchema1Signed => new GetImageManifestResult(
+                    contentType,
+                    JsonSerializer.Deserialize<ImageManifest2_1>(response.Body),
+                    response.Body)
+                {
+                    DockerContentDigest = response.GetHeader("Docker-Content-Digest"),
+                    Etag = response.GetHeader("Etag"),
+                },
+                ManifestMediaTypes.ManifestSchema2 => new GetImageManifestResult(
+                    contentType,
+                    JsonSerializer.Deserialize<ImageManifest2_2>(response.Body),
+                    response.Body)
+                {
+                    DockerContentDigest = response.GetHeader("Docker-Content-Digest")
+                },
+                ManifestMediaTypes.ManifestList => new GetImageManifestResult(
+                    contentType,
+                    JsonSerializer.Deserialize<ManifestList>(response.Body),
+                    response.Body),
+                _ => throw new Exception($"Unexpected ContentType '{contentType}'."),
+            };
         }
 
         /// <inheritdoc />
@@ -90,12 +93,13 @@
 
             try
             {
-                response = await this._client.MakeRequestAsync(
-                    cancellationToken,
-                    HttpMethod.Head,
-                    $"v2/{name}/manifests/{reference}",
-                    null,
-                    headers).ConfigureAwait(false);
+                var request = new RequestBuilder()
+                    .WithHttpMethod(HttpMethod.Head)
+                    .WithPath($"v2/{name}/manifests/{reference}")
+                    .WithHeaders(headers)
+                    .Build();
+
+                response = await this.client.MakeRequestAsync(request, cancellationToken).ConfigureAwait(false);
             }
             catch (RegistryApiException e)
             {
@@ -107,23 +111,25 @@
                 throw;
             }
 
-            return response.StatusCode == HttpStatusCode.OK;
+            return response?.StatusCode == HttpStatusCode.OK;
         }
 
-        //public Task PutManifestAsync(string name, string reference, ImageManifest manifest,
-        //    CancellationToken cancellationToken = default)
-        //{
-        //    throw new NotImplementedException();
-        //}
+        public Task PutManifestAsync(string name, string reference, ImageManifest manifest, CancellationToken cancellationToken = default)
+        {
+            throw new NotImplementedException();
+        }
 
         public async Task DeleteManifestAsync(
             string name,
             string reference,
             CancellationToken cancellationToken = default)
         {
-            var path = $"v2/{name}/manifests/{reference}";
+            var request = new RequestBuilder()
+                .WithHttpMethod(HttpMethod.Delete)
+                .WithPath($"v2/{name}/manifests/{reference}")
+                .Build();
 
-            await this._client.MakeRequestAsync(cancellationToken, HttpMethod.Delete, path);
+            await this.client.MakeRequestAsync(request, cancellationToken);
         }
 
         private string GetContentType(string contentTypeHeader, string manifest)
@@ -133,7 +139,7 @@
                 return contentTypeHeader;
             }
 
-            var check = JsonConvert.DeserializeObject<SchemaCheck>(manifest);
+            var check = JsonSerializer.Deserialize<SchemaCheck>(manifest);
 
             if (!string.IsNullOrWhiteSpace(check.MediaType))
             {
@@ -150,10 +156,10 @@
                 return ManifestMediaTypes.ManifestSchema2;
             }
 
-            throw new Exception(
-                $"Unable to determine schema type from version {check.SchemaVersion}");
+            throw new Exception($"Unable to determine schema type from version {check.SchemaVersion}");
         }
 
+        /// <inheritdoc />
         [PublicAPI]
         public async Task<string> GetManifestRawAsync(
             string name,
@@ -165,15 +171,16 @@
                 {
                     "Accept",
                     $"{ManifestMediaTypes.ManifestSchema1}, {ManifestMediaTypes.ManifestSchema2}, {ManifestMediaTypes.ManifestList}, {ManifestMediaTypes.ManifestSchema1Signed}"
-                }
+                },
             };
 
-            var response = await this._client.MakeRequestAsync(
-                cancellationToken,
-                HttpMethod.Get,
-                $"v2/{name}/manifests/{reference}",
-                null,
-                headers).ConfigureAwait(false);
+            var request = new RequestBuilder()
+                .WithHttpMethod(HttpMethod.Get)
+                .WithPath($"v2/{name}/manifests/{reference}")
+                .WithHeaders(headers)
+                .Build();
+
+            var response = await this.client.MakeRequestAsync(request, cancellationToken).ConfigureAwait(false);
 
             return response.Body;
         }
@@ -181,7 +188,7 @@
         private class SchemaCheck
         {
             /// <summary>
-            /// This field specifies the image manifest schema version as an integer.
+            /// Gets or sets the image manifest schema version as an integer.
             /// </summary>
             [DataMember(Name = "schemaVersion")]
             public int? SchemaVersion { get; set; }

@@ -1,14 +1,14 @@
 ﻿namespace Docker.Registry.Client.Tests.Integration.DockerHub
 {
     using System;
-    using Authentication;
-    using Registry;
+    using Docker.Registry.Client.Authentication;
+    using Docker.Registry.Client.Registry;
 
-    public abstract class DockerHubBaseTest
+    public abstract class TestBase
     {
-        internal readonly IRegistryClient client;
+        private protected readonly IRegistryClient client;
 
-        protected DockerHubBaseTest()
+        protected TestBase()
         {
             var authentication = new PasswordOAuthAuthenticationProvider(
                 Environment.GetEnvironmentVariable(Constants.DockerHubUsernameEnvironmentVariable),

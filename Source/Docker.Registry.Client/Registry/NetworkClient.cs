@@ -2,29 +2,29 @@
 {
     using System;
     using System.Collections.Generic;
+    using System.Globalization;
     using System.IO;
     using System.Linq;
     using System.Net;
     using System.Net.Http;
     using System.Threading;
     using System.Threading.Tasks;
-    using Authentication;
-    using Helpers;
+    using Docker.Registry.Client.Authentication;
+    using Docker.Registry.Client.Helpers;
 
     internal class NetworkClient : IDisposable
     {
         private const string UserAgent = "Docker.Registry.Client";
 
-        private static readonly TimeSpan InfiniteTimeout =
-            TimeSpan.FromMilliseconds(Timeout.Infinite);
+        private static readonly TimeSpan InfiniteTimeout = TimeSpan.FromMilliseconds(Timeout.Infinite);
 
-        private readonly AuthenticationProvider _authenticationProvider;
+        private readonly AuthenticationProvider authenticationProvider;
 
-        private readonly HttpClient _client;
+        private readonly HttpClient client;
 
-        private readonly RegistryClientConfiguration _configuration;
+        private readonly RegistryClientConfiguration configuration;
 
-        private readonly IEnumerable<Action<RegistryApiResponse>> _errorHandlers =
+        private readonly IEnumerable<Action<RegistryApiResponse>> errorHandlers =
             new Action<RegistryApiResponse>[]
             {
                 r =>
@@ -36,44 +36,33 @@
                 }
             };
 
-        private Uri _effectiveEndpointBaseUri;
+        private Uri baseUri;
 
         public NetworkClient(
             RegistryClientConfiguration configuration,
             AuthenticationProvider authenticationProvider)
         {
-            this._configuration =
-                configuration ?? throw new ArgumentNullException(nameof(configuration));
-
-            this._authenticationProvider = authenticationProvider
-                                           ?? throw new ArgumentNullException(
-                                               nameof(authenticationProvider));
-
-            this._client = new HttpClient();
-
+            this.configuration = configuration ?? throw new ArgumentNullException(nameof(configuration));
+            this.authenticationProvider = authenticationProvider ?? throw new ArgumentNullException(nameof(authenticationProvider));
+            this.client = new HttpClient();
             this.DefaultTimeout = configuration.DefaultTimeout;
-
-            this.JsonSerializer = new JsonSerializer();
-
-            if (this._configuration.EndpointBaseUri != null)
+            if (this.configuration.EndpointBaseUri != null)
             {
-                this._effectiveEndpointBaseUri = this._configuration.EndpointBaseUri;
+                this.baseUri = this.configuration.EndpointBaseUri;
             }
         }
 
         public TimeSpan DefaultTimeout { get; set; }
 
-        public JsonSerializer JsonSerializer { get; }
-
-        public void Dispose() => this._client?.Dispose();
+        /// <inheritdoc/>
+        public void Dispose() => this.client?.Dispose();
 
         /// <summary>
         /// Ensures that we have configured (and potentially probed) the end point.
         /// </summary>
-        /// <returns></returns>
-        private async Task EnsureConnection()
+        private async Task EnsureConnectionAsync()
         {
-            if (this._effectiveEndpointBaseUri != null)
+            if (this.baseUri != null)
             {
                 return;
             }
@@ -81,9 +70,9 @@
             var tryUrls = new List<string>();
 
             // clean up the host
-            var host = this._configuration.Host.ToLower().Trim();
+            var host = this.configuration.Host.ToLower(CultureInfo.InvariantCulture).Trim();
 
-            if (host.StartsWith("http"))
+            if (host.StartsWith("http", StringComparison.InvariantCultureIgnoreCase))
             {
                 // includes schema -- don't add
                 tryUrls.Add(host);
@@ -100,13 +89,13 @@
             {
                 try
                 {
-                    await this.ProbeSingleAsync($"{url}/v2/");
-                    this._effectiveEndpointBaseUri = new Uri(url);
+                    await this.ProbeSingleAsync($"{url}/v2/").ConfigureAwait(false);
+                    this.baseUri = new Uri(url);
                     return;
                 }
-                catch (Exception ex)
+                catch (Exception e)
                 {
-                    exceptions.Add(ex);
+                    exceptions.Add(e);
                 }
             }
 
@@ -117,66 +106,37 @@
 
         private async Task ProbeSingleAsync(string uri)
         {
-            using (var request = new HttpRequestMessage(HttpMethod.Get, uri))
-            using (await this._client.SendAsync(request))
-            {
-            }
+            using var request = new HttpRequestMessage(HttpMethod.Get, uri);
+            await this.client.SendAsync(request).ConfigureAwait(false);
         }
 
-        internal async Task<RegistryApiResponse<string>> MakeRequestAsync(
-            CancellationToken cancellationToken,
-            HttpMethod method,
-            string path,
-            IQueryString queryString = null,
-            IDictionary<string, string> headers = null,
-            Func<HttpContent> content = null)
+        internal async Task<RegistryApiResponse<string>> MakeRequestAsync(Request request, CancellationToken cancellationToken)
         {
-            //Console.WriteLine(
-            //    "Requesting Path: {0} Method: {1} QueryString: {2}",
-            //    path,
-            //    method,
-            //    queryString?.GetQueryString());
+            using var response = await this.InternalMakeRequestAsync(
+                request,
+                cancellationToken).ConfigureAwait(false);
 
-            using (var response = await this.InternalMakeRequestAsync(
-                this.DefaultTimeout,
-                HttpCompletionOption.ResponseContentRead,
-                method,
-                path,
-                queryString,
-                headers,
-                content,
-                cancellationToken))
-            {
-                var responseBody = await response.Content.ReadAsStringAsync().ConfigureAwait(false);
+            var responseBody = await response.Content.ReadAsStringAsync(cancellationToken).ConfigureAwait(false);
 
-                var apiResponse = new RegistryApiResponse<string>(
-                    response.StatusCode,
-                    responseBody,
-                    response.Headers);
+            var apiResponse = new RegistryApiResponse<string>(
+                response.StatusCode,
+                responseBody,
+                response.Headers);
 
-                this.HandleIfErrorResponse(apiResponse);
+            this.HandleIfErrorResponse(apiResponse);
 
-                return apiResponse;
-            }
+            return apiResponse;
         }
 
-        internal async Task<RegistryApiResponse<Stream>> MakeRequestForStreamedResponseAsync(
-            CancellationToken cancellationToken,
-            HttpMethod method,
-            string path,
-            IQueryString queryString = null)
+        internal async Task<RegistryApiResponse<Stream>> MakeRequestForStreamedResponseAsync(Request request,
+            CancellationToken cancellationToken)
         {
             var response = await this.InternalMakeRequestAsync(
-                InfiniteTimeout,
-                HttpCompletionOption.ResponseHeadersRead,
-                method,
-                path,
-                queryString,
-                null,
-                null,
-                cancellationToken);
+                    request,
+                    cancellationToken)
+                .ConfigureAwait(false);
 
-            var body = await response.Content.ReadAsStreamAsync();
+            var body = await response.Content.ReadAsStreamAsync(cancellationToken);
 
             var apiResponse = new RegistryApiResponse<Stream>(
                 response.StatusCode,
@@ -189,47 +149,32 @@
         }
 
         private async Task<HttpResponseMessage> InternalMakeRequestAsync(
-            TimeSpan timeout,
-            HttpCompletionOption completionOption,
-            HttpMethod method,
-            string path,
-            IQueryString queryString,
-            IDictionary<string, string> headers,
-            Func<HttpContent> content,
+            Request request,
             CancellationToken cancellationToken)
         {
-            await this.EnsureConnection();
+            await this.EnsureConnectionAsync().ConfigureAwait(false);
 
-            var request = this.PrepareRequest(method, path, queryString, headers, content);
+            var httpRequestMessage = this.PrepareRequest(request);
 
-            if (timeout != InfiniteTimeout)
-            {
-                var timeoutTokenSource =
-                    CancellationTokenSource.CreateLinkedTokenSource(cancellationToken);
-                timeoutTokenSource.CancelAfter(timeout);
-                cancellationToken = timeoutTokenSource.Token;
-            }
+            await this.authenticationProvider.AuthenticateAsync(httpRequestMessage);
 
-            await this._authenticationProvider.AuthenticateAsync(request);
-
-            var response = await this._client.SendAsync(
-                request,
-                completionOption,
-                cancellationToken);
+            var response = await this.client.SendAsync(
+                httpRequestMessage,
+                this.CreateLinkedToken(cancellationToken))
+                .ConfigureAwait(false);
 
             if (response.StatusCode == HttpStatusCode.Unauthorized)
             {
-                //Prepare another request (we can't reuse the same request)
-                var request2 = this.PrepareRequest(method, path, queryString, headers, content);
+                // Prepare another request (we can't reuse the same request)
+                var request2 = this.PrepareRequest(request);
 
-                //Authenticate given the challenge
-                await this._authenticationProvider.AuthenticateAsync(request2, response);
+                // Authenticate given the challenge
+                await this.authenticationProvider.AuthenticateAsync(request2, response).ConfigureAwait(false);
 
-                //Send it again
-                response = await this._client.SendAsync(
+                // Send it again
+                response = await this.client.SendAsync(
                     request2,
-                    completionOption,
-                    cancellationToken);
+                    cancellationToken).ConfigureAwait(false);
             }
 
             return response;
@@ -238,42 +183,44 @@
         private void HandleIfErrorResponse(RegistryApiResponse response)
         {
             // If no customer handlers just default the response.
-            foreach (var handler in this._errorHandlers)
+            foreach (var handler in this.errorHandlers)
             {
                 handler(response);
             }
 
             // No custom handler was fired. Default the response for generic success/failures.
-            if (response.StatusCode < HttpStatusCode.OK
-                || response.StatusCode >= HttpStatusCode.BadRequest)
+            if (response.StatusCode is < HttpStatusCode.OK or >= HttpStatusCode.BadRequest)
             {
                 throw new RegistryApiException(response);
             }
         }
 
-        internal HttpRequestMessage PrepareRequest(
-            HttpMethod method,
-            string path,
-            IQueryString queryString,
-            IDictionary<string, string> headers,
-            Func<HttpContent> content)
+        private HttpRequestMessage PrepareRequest(Request request)
         {
-            if (string.IsNullOrEmpty(path))
+            if (string.IsNullOrEmpty(request.Path) && string.IsNullOrEmpty(request.Uri))
             {
-                throw new ArgumentNullException(nameof(path));
+                throw new ArgumentNullException("Either path or uri is required.");
             }
 
-            var request = new HttpRequestMessage(
-                method,
-                this._effectiveEndpointBaseUri.BuildUri(path, queryString));
+            var uri = string.IsNullOrEmpty(request.Uri) ?
+                this.baseUri.BuildUri(request.Path, request.QueryString)
+                : new Uri(request.Uri).AddQueryString(request.QueryString);
 
-            request.Headers.Add("User-Agent", UserAgent);
-            request.Headers.AddRange(headers);
+            var httpRequestMessage = new HttpRequestMessage(request.HttpMethod, uri);
 
-            //Create the content
-            request.Content = content?.Invoke();
+            httpRequestMessage.Headers.Add("User-Agent", UserAgent);
+            httpRequestMessage.Headers.AddRange(request.Headers);
 
-            return request;
+            httpRequestMessage.Content = request.Content;
+
+            return httpRequestMessage;
+        }
+
+        private CancellationToken CreateLinkedToken(CancellationToken cancellationToken)
+        {
+            var timeoutTokenSource = CancellationTokenSource.CreateLinkedTokenSource(cancellationToken);
+            timeoutTokenSource.CancelAfter(this.DefaultTimeout);
+            return timeoutTokenSource.Token;
         }
     }
 }

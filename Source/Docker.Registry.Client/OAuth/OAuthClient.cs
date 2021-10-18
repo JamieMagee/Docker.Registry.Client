@@ -4,14 +4,14 @@
     using System.Net.Http;
     using System.Net.Http.Headers;
     using System.Text;
+    using System.Text.Json;
     using System.Threading;
     using System.Threading.Tasks;
-    using Helpers;
-    using Newtonsoft.Json;
+    using Docker.Registry.Client.Helpers;
 
     internal class OAuthClient
     {
-        private readonly HttpClient _client = new();
+        private readonly HttpClient client = new();
 
         private async Task<OAuthToken> GetTokenInnerAsync(
             string realm,
@@ -28,7 +28,7 @@
 
             var builder = new UriBuilder(new Uri(realm))
             {
-                Query = queryString.GetQueryString()
+                Query = queryString.GetQueryString(),
             };
 
             var request = new HttpRequestMessage(HttpMethod.Get, builder.Uri);
@@ -36,7 +36,6 @@
             if (username != null && password != null)
             {
                 // https://gist.github.com/jlhawn/8f218e7c0b14c941c41f
-
                 var bytes = Encoding.UTF8.GetBytes($"{username}:{password}");
 
                 var parameter = Convert.ToBase64String(bytes);
@@ -44,19 +43,17 @@
                 request.Headers.Authorization = new AuthenticationHeaderValue("Basic", parameter);
             }
 
-            using (var response = await this._client.SendAsync(request, cancellationToken))
+            using var response = await this.client.SendAsync(request, cancellationToken).ConfigureAwait(false);
+            if (!response.IsSuccessStatusCode)
             {
-                if (!response.IsSuccessStatusCode)
-                {
-                    throw new UnauthorizedAccessException("Unable to authenticate.");
-                }
-
-                var body = await response.Content.ReadAsStringAsync();
-
-                var token = JsonConvert.DeserializeObject<OAuthToken>(body);
-
-                return token;
+                throw new UnauthorizedAccessException("Unable to authenticate.");
             }
+
+            var body = await response.Content.ReadAsStringAsync(cancellationToken).ConfigureAwait(false);
+
+            var token = JsonSerializer.Deserialize<OAuthToken>(body);
+
+            return token;
         }
 
         public Task<OAuthToken> GetTokenAsync(

@@ -48,10 +48,15 @@
         public TimeSpan DefaultTimeout { get; internal set; } = TimeSpan.FromSeconds(100);
 
         [PublicAPI]
-        public IRegistryClient CreateClient() => new RegistryClient(this, new AnonymousOAuthAuthenticationProvider());
+        public IRegistryClient CreateClient()
+        {
+            return new RegistryClient(this, new AnonymousOAuthAuthenticationProvider());
+        }
 
         [PublicAPI]
-        public IRegistryClient CreateClient(AuthenticationProvider authenticationProvider) =>
-            new RegistryClient(this, authenticationProvider);
+        public IRegistryClient CreateClient(AuthenticationProvider authenticationProvider)
+        {
+            return new RegistryClient(this, authenticationProvider);
+        }
     }
 }

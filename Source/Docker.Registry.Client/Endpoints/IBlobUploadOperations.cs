@@ -19,7 +19,7 @@
         [PublicAPI]
         Task UploadBlobAsync(
             string name,
-            int contentLength,
+            long contentLength,
             Stream stream,
             string digest,
             CancellationToken cancellationToken = default);

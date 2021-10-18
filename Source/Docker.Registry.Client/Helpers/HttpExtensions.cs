@@ -5,10 +5,10 @@
     using System.Linq;
     using System.Net.Http;
     using System.Net.Http.Headers;
-    using JetBrains.Annotations;
-    using Registry;
+    using System.Web;
+    using Docker.Registry.Client.Registry;
 
-    internal static class HttpUtility
+    internal static class HttpExtensions
     {
         internal static Uri BuildUri(this Uri baseUri, string path, IQueryString queryString)
         {
@@ -32,13 +32,30 @@
             return builder.Uri;
         }
 
+        internal static Uri AddQueryString(this Uri baseUri, IQueryString queryString)
+        {
+            if (baseUri is null)
+            {
+                throw new ArgumentNullException(nameof(baseUri));
+            }
+
+            var builder = new UriBuilder(baseUri);
+
+            if (queryString is not null)
+            {
+                builder.Query += $"&{queryString.GetQueryString()}";
+            }
+
+            return builder.Uri;
+        }
+
         /// <summary>
         /// Attempts to retrieve the value of a response header.
         /// </summary>
         /// <param name="response"></param>
         /// <param name="name"></param>
         /// <returns>The first value if one is found, null otherwise.</returns>
-        public static string GetHeader([NotNull] this RegistryApiResponse response, string name)
+        public static string GetHeader(this RegistryApiResponse response, string name)
         {
             if (response == null)
             {
@@ -57,14 +74,17 @@
         /// <returns>The first value if one is found, null otherwise.</returns>
         public static string[] GetHeaders(
             this IEnumerable<KeyValuePair<string, string[]>> headers,
-            string name) => headers
-            .IfNullEmpty()
-            .Where(h => h.Key == name)
-            .Select(h => h.Value?.FirstOrDefault())
-            .ToArray();
+            string name)
+        {
+            return headers
+                .IfNullEmpty()
+                .Where(h => h.Key == name)
+                .Select(h => h.Value?.FirstOrDefault())
+                .ToArray();
+        }
 
         public static void AddRange(
-            [NotNull] this HttpRequestHeaders header,
+            this HttpRequestHeaders header,
             IEnumerable<KeyValuePair<string, string>> headers)
         {
             if (header == null)
@@ -79,7 +99,7 @@
         }
 
         public static AuthenticationHeaderValue GetHeaderBySchema(
-            [NotNull] this HttpResponseMessage response,
+            this HttpResponseMessage response,
             string schema)
         {
             if (response == null)
@@ -90,7 +110,7 @@
             return response.Headers.WwwAuthenticate.FirstOrDefault(s => s.Scheme == schema);
         }
 
-        public static int? GetContentLength([NotNull] this HttpResponseHeaders responseHeaders)
+        public static int? GetContentLength(this HttpResponseHeaders responseHeaders)
         {
             if (responseHeaders == null)
             {
@@ -112,7 +132,7 @@
             return null;
         }
 
-        public static string GetString([NotNull] this HttpResponseHeaders responseHeaders, string name)
+        public static string GetString(this HttpResponseHeaders responseHeaders, string name)
         {
             if (responseHeaders == null)
             {

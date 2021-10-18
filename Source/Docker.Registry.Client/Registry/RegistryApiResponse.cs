@@ -22,7 +22,10 @@
             HttpStatusCode statusCode,
             TBody body,
             HttpResponseHeaders headers)
-            : base(statusCode, headers) => this.Body = body;
+            : base(statusCode, headers)
+        {
+            this.Body = body;
+        }
 
         public TBody Body { get; }
     }

@@ -1,9 +1,9 @@
 ﻿namespace Docker.Registry.Client.Registry
 {
     using System;
-    using Authentication;
-    using Endpoints;
-    using Endpoints.Implementations;
+    using Docker.Registry.Client.Authentication;
+    using Docker.Registry.Client.Endpoints;
+    using Docker.Registry.Client.Endpoints.Implementations;
 
     internal sealed class RegistryClient : IRegistryClient
     {

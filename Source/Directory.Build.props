@@ -8,7 +8,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <InternalsVisibleTo Include="$(MSBuildProjectName).Tests.Unit" />
+    <InternalsVisibleTo Include="$(MSBuildProjectName).Tests.Unit"/>
   </ItemGroup>
 
   <PropertyGroup Label="Signing">
