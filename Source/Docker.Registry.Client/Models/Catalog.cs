@@ -1,11 +1,10 @@
 ﻿namespace Docker.Registry.Client.Models
 {
-    using System.Runtime.Serialization;
+    using System.Text.Json.Serialization;
 
-    [DataContract]
     public class Catalog
     {
-        [DataMember(Name = "repositories", EmitDefaultValue = false)]
+        [JsonPropertyName("repositories")]
         public string[] Repositories { get; set; }
     }
 }

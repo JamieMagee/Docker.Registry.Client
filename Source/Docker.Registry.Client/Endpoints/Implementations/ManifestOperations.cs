@@ -4,8 +4,8 @@
     using System.Collections.Generic;
     using System.Net;
     using System.Net.Http;
-    using System.Runtime.Serialization;
     using System.Text.Json;
+    using System.Text.Json.Serialization;
     using System.Threading;
     using System.Threading.Tasks;
     using Docker.Registry.Client.Helpers;
@@ -190,10 +190,10 @@
             /// <summary>
             /// Gets or sets the image manifest schema version as an integer.
             /// </summary>
-            [DataMember(Name = "schemaVersion")]
+            [JsonPropertyName("schemaVersion")]
             public int? SchemaVersion { get; set; }
 
-            [DataMember(Name = "mediaType")]
+            [JsonPropertyName("mediaType")]
             public string MediaType { get; set; }
         }
     }

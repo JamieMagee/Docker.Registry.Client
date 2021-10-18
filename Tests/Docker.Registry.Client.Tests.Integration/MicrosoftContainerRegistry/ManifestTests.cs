@@ -2,6 +2,7 @@
 {
     using System.Threading.Tasks;
     using Docker.Registry.Client.Models;
+    using FluentAssertions;
     using Xunit;
 
     public class ManifestTests : TestBase
@@ -9,36 +10,36 @@
         [Fact]
         public async Task DoesManifestExistAsync_Exists()
         {
-            var result = await this.client.Manifest.DoesManifestExistAsync("library/ubuntu", "latest");
+            var result = await this.client.Manifest.DoesManifestExistAsync("dotnet/sdk", "latest");
 
-            Assert.True(result);
+            result.Should().BeTrue();
         }
 
         [Fact]
         public async Task DoesManifestExistAsync_DoesNotExist()
         {
-            var result = await this.client.Manifest.DoesManifestExistAsync("library/ubuntu", "this-tag-does-not-exist");
+            var result = await this.client.Manifest.DoesManifestExistAsync("dotnet/sdk", "this-tag-does-not-exist");
 
-            Assert.False(result);
+            result.Should().BeFalse();
         }
 
         [Fact]
         public async Task GetManifestAsync_ManifestList()
         {
-            var result = await this.client.Manifest.GetManifestAsync("library/ubuntu", "latest");
+            var result = await this.client.Manifest.GetManifestAsync("dotnet/sdk", "latest");
 
-            Assert.NotNull(result);
-            Assert.Equal(typeof(ManifestList), result.Manifest.GetType());
+            result.Should().NotBeNull();
+            result.Manifest.Should().BeOfType<ManifestList>();
         }
 
         [Fact]
         public async Task GetManifestAsync_Manifest()
         {
-            var result = await this.client.Manifest.GetManifestAsync("library/ubuntu",
-                "sha256:07782849f2cff04e9bc29449c27d0fb2076e61e8bdb4475ec5dbc5386ed41a4f");
+            var result = await this.client.Manifest.GetManifestAsync("dotnet/sdk",
+                "sha256:8257c5cbf04fd66e6e98c54178f5e02e5d6ddcf3fa38d01260306ada205e7e9e");
 
-            Assert.NotNull(result);
-            Assert.Equal(typeof(ImageManifest2_2), result.Manifest.GetType());
+            result.Should().NotBeNull();
+            result.Manifest.Should().BeOfType<ImageManifest2_2>();
         }
     }
 }

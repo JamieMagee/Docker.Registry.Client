@@ -1,6 +1,5 @@
 ﻿namespace Docker.Registry.Client.Registry
 {
-    using System;
     using System.Collections.Generic;
     using System.Net.Http;
     using Docker.Registry.Client.Helpers;
