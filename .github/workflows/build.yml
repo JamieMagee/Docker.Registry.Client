@@ -64,7 +64,7 @@ jobs:
       url: https://github.com/JamieMagee/Docker.Registry.Client/packages
     permissions:
       packages: write
-    runs-on: ubuntu-latest
+    runs-on: windows-latest
     steps:
       - name: 'Download Artifact'
         uses: actions/download-artifact@v2
@@ -84,12 +84,12 @@ jobs:
     environment:
       name: 'NuGet'
       url: https://www.nuget.org/packages/Docker.Registry.Client
-    runs-on: ubuntu-latest
+    runs-on: windows-latest
     steps:
       - name: 'Download Artifact'
         uses: actions/download-artifact@v2
         with:
-          name: ubuntu-latest
+          name: 'artifacts'
       - name: 'Dotnet NuGet Push'
         run: |
           Get-ChildItem .\ -Filter *.nupkg |
