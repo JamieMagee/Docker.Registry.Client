@@ -11,24 +11,34 @@
     {
         internal static Uri BuildUri(this Uri baseUri, string path, IQueryString queryString)
         {
+            var uri = baseUri;
+
             if (baseUri == null)
             {
                 throw new ArgumentNullException(nameof(baseUri));
             }
 
-            var builder = new UriBuilder(baseUri);
-
             if (!string.IsNullOrEmpty(path))
             {
-                builder.Path += path;
+                uri = new Uri(uri, path);
             }
 
             if (queryString != null)
             {
-                builder.Query = queryString.GetQueryString();
+                var builder = new UriBuilder(uri);
+                if (builder.Query.Length > 1)
+                {
+                    builder.Query += '&' + queryString.GetQueryString();
+                }
+                else
+                {
+                    builder.Query = queryString.GetQueryString();
+                }
+
+                uri = builder.Uri;
             }
 
-            return builder.Uri;
+            return uri;
         }
 
         internal static Uri AddQueryString(this Uri baseUri, IQueryString queryString)
