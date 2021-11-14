@@ -2,7 +2,7 @@
 {
     using System.Text.Json.Serialization;
 
-    public class ManifestFsLayer
+    public record ManifestFsLayer
     {
         [JsonPropertyName("blobSum")]
         public string BlobSum { get; set; }

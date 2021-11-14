@@ -5,7 +5,7 @@
     /// <summary>
     /// Image Manifest Version 2, Schema 1
     /// </summary>
-    public class ImageManifest2_1 : ImageManifest
+    public record ImageManifest2_1 : ImageManifest
     {
         /// <summary>
         /// name is the name of the image’s repository

@@ -1,8 +1,8 @@
 ﻿namespace Docker.Registry.Client.Models
 {
-    using QueryParameters;
+    using Docker.Registry.Client.QueryParameters;
 
-    public class ListImageTagsParameters
+    public record ListImageTagsParameters
     {
         /// <summary>
         /// Limit the number of entries in each response. It not present, all entries will be returned

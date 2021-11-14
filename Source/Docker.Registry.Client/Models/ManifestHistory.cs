@@ -2,7 +2,7 @@
 {
     using System.Text.Json.Serialization;
 
-    public class ManifestHistory
+    public record ManifestHistory
     {
         [JsonPropertyName("v1Compatibility")]
         public string V1Compatibility { get; set; }

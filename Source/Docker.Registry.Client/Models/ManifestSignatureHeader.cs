@@ -2,7 +2,7 @@
 {
     using System.Text.Json.Serialization;
 
-    public class ManifestSignatureHeader
+    public record ManifestSignatureHeader
     {
         [JsonPropertyName("alg")]
         public string Alg { get; set; }

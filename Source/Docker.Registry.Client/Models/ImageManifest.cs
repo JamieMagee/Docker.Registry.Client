@@ -2,7 +2,7 @@
 {
     using System.Text.Json.Serialization;
 
-    public abstract class ImageManifest
+    public abstract record ImageManifest
     {
         /// <summary>
         /// This field specifies the image manifest schema version as an integer.

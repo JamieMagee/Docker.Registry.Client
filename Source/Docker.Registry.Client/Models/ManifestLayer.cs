@@ -2,7 +2,7 @@
 {
     using System.Text.Json.Serialization;
 
-    public class ManifestLayer
+    public record ManifestLayer
     {
         /// <summary>
         /// The MIME type of the referenced object. This should generally be application/vnd.docker.image.rootfs.diff.tar.gzip.

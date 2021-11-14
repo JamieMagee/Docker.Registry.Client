@@ -4,7 +4,7 @@
     using JetBrains.Annotations;
 
     [PublicAPI]
-    public class Manifest
+    public record Manifest
     {
         /// <summary>
         /// The MIME type of the referenced object. This will generally be application/vnd.docker.image.manifest.v2+json, but

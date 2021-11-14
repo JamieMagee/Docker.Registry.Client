@@ -2,7 +2,7 @@
 {
     using System.Text.Json.Serialization;
 
-    public class ImageManifest2_2 : ImageManifest
+    public record ImageManifest2_2 : ImageManifest
     {
         /// <summary>
         /// The MIME type of the referenced object

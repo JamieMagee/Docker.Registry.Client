@@ -2,7 +2,7 @@
 {
     using System.Text.Json.Serialization;
 
-    public class Platform
+    public record Platform
     {
         /// <summary>
         /// The architecture field specifies the CPU architecture, for example amd64 or ppc64le

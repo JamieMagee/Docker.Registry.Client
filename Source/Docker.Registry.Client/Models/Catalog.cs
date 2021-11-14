@@ -2,7 +2,7 @@
 {
     using System.Text.Json.Serialization;
 
-    public class Catalog
+    public record Catalog
     {
         [JsonPropertyName("repositories")]
         public string[] Repositories { get; set; }

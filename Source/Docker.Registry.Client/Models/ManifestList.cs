@@ -7,7 +7,7 @@
     /// is optional, and relatively few images will use one of these manifests. A client will distinguish a manifest list
     /// from an image manifest based on the Content-Type returned in the HTTP response.
     /// </summary>
-    public class ManifestList : ImageManifest
+    public record ManifestList : ImageManifest
     {
         /// <summary>
         /// The MIME type of the manifest list. This should be set to

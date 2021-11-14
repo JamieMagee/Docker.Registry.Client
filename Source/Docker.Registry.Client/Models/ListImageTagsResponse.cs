@@ -2,7 +2,7 @@
 {
     using System.Text.Json.Serialization;
 
-    public class ListImageTagsResponse
+    public record ListImageTagsResponse
     {
         [JsonPropertyName("name")]
         public string Name { get; set; }

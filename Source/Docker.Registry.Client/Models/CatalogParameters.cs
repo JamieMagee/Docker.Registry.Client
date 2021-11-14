@@ -4,7 +4,7 @@
     using JetBrains.Annotations;
 
     [PublicAPI]
-    public class CatalogParameters
+    public record CatalogParameters
     {
         /// <summary>
         /// Limit the number of entries in each response. It not present, all entries will be returned
