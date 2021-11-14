@@ -2,6 +2,7 @@
 {
     using System.Threading.Tasks;
     using Docker.Registry.Client.Models;
+    using FluentAssertions;
     using Xunit;
 
     public class ManifestTests : TestBase
@@ -39,6 +40,18 @@
 
             Assert.NotNull(result);
             Assert.Equal(typeof(ImageManifest2_2), result.Manifest.GetType());
+        }
+
+        [Fact]
+        public async Task PutManifestAsync_Manifest()
+        {
+            var ubuntu = await this.client.Manifest.GetManifestAsync("library/ubuntu",
+                "sha256:07782849f2cff04e9bc29449c27d0fb2076e61e8bdb4475ec5dbc5386ed41a4f");
+            await this.client.Manifest.PutManifestAsync("jamiemageeregistryclient/ubuntu", "latest", ubuntu.Manifest);
+            var result = await this.client.Manifest.GetManifestAsync("jamiemageeregistryclient/ubuntu", "latest");
+
+            result.Should().NotBeNull();
+            ubuntu.Manifest.Should().BeEquivalentTo(result.Manifest);
         }
     }
 }

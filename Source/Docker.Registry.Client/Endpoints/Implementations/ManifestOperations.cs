@@ -4,6 +4,8 @@
     using System.Collections.Generic;
     using System.Net;
     using System.Net.Http;
+    using System.Text;
+    using System.Text.Encodings.Web;
     using System.Text.Json;
     using System.Text.Json.Serialization;
     using System.Threading;
@@ -114,9 +116,15 @@
             return response?.StatusCode == HttpStatusCode.OK;
         }
 
-        public Task PutManifestAsync(string name, string reference, ImageManifest manifest, CancellationToken cancellationToken = default)
+        public async Task PutManifestAsync(string name, string reference, ImageManifest manifest, CancellationToken cancellationToken = default)
         {
-            throw new NotImplementedException();
+            var request = new RequestBuilder()
+                .WithHttpMethod(HttpMethod.Put)
+                .WithPath($"v2/{name}/manifests/{reference}")
+                .WithContent(this.SerializeManifest(manifest))
+                .Build();
+
+            await this.client.MakeRequestAsync(request, cancellationToken);
         }
 
         public async Task DeleteManifestAsync(
@@ -183,6 +191,35 @@
             var response = await this.client.MakeRequestAsync(request, cancellationToken).ConfigureAwait(false);
 
             return response.Body;
+        }
+
+        private StringContent SerializeManifest(ImageManifest manifest)
+        {
+            var options = new JsonSerializerOptions
+            {
+                Encoder = JavaScriptEncoder.UnsafeRelaxedJsonEscaping,
+                DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingDefault,
+            };
+
+            string json;
+            StringContent content = null;
+            switch (manifest)
+            {
+                case ImageManifest2_1 _:
+                    json = JsonSerializer.Serialize(manifest, typeof(ImageManifest2_1), options);
+                    content = new StringContent(json, Encoding.UTF8, ManifestMediaTypes.ManifestSchema1);
+                    break;
+                case ImageManifest2_2 _:
+                    json = JsonSerializer.Serialize(manifest, typeof(ImageManifest2_2), options);
+                    content = new StringContent(json, Encoding.UTF8, ManifestMediaTypes.ManifestSchema2);
+                    break;
+                case ManifestList _:
+                    json = JsonSerializer.Serialize(manifest, typeof(ManifestList), options);
+                    content = new StringContent(json, Encoding.UTF8, ManifestMediaTypes.ManifestList);
+                    break;
+            }
+
+            return content;
         }
 
         private class SchemaCheck

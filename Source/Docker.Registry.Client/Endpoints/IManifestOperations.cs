@@ -2,8 +2,8 @@
 {
     using System.Threading;
     using System.Threading.Tasks;
+    using Docker.Registry.Client.Models;
     using JetBrains.Annotations;
-    using Models;
 
     /// <summary>
     /// Manifest operations.
@@ -18,10 +18,7 @@
         ///// <param name="cancellationToken"></param>
         ///// <returns></returns>
         [PublicAPI]
-        Task<GetImageManifestResult> GetManifestAsync(
-            string name,
-            string reference,
-            CancellationToken cancellationToken = default);
+        Task<GetImageManifestResult> GetManifestAsync(string name, string reference, CancellationToken cancellationToken = default);
 
         /// <summary>
         /// Returns true if the image exists, false otherwise.
@@ -40,7 +37,7 @@
         ///// <param name="manifest"></param>
         ///// <param name="cancellationToken"></param>
         ///// <returns></returns>
-        //Task PutManifestAsync(string name, string reference, ImageManifest manifest, CancellationToken cancellationToken = default);
+        Task PutManifestAsync(string name, string reference, ImageManifest manifest, CancellationToken cancellationToken = default);
 
         /// <summary>
         /// Delete the manifest identified by name and reference. Note that a manifest can only be deleted by digest.
@@ -50,9 +47,6 @@
         /// <param name="cancellationToken"></param>
         /// <returns></returns>
         [PublicAPI]
-        Task DeleteManifestAsync(
-            string name,
-            string reference,
-            CancellationToken cancellationToken = default);
+        Task DeleteManifestAsync(string name, string reference, CancellationToken cancellationToken = default);
     }
 }
