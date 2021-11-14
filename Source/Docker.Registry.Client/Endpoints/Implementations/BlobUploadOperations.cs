@@ -41,12 +41,19 @@
 
             var request2 = new RequestBuilder()
                 .WithHttpMethod(HttpMethod.Put)
-                .WithUri(location)
                 .WithContent(content)
-                .WithQueryString(parameters)
-                .Build();
+                .WithQueryString(parameters);
 
-            await this._client.MakeRequestAsync(request2, cancellationToken).ConfigureAwait(false);
+            if (Uri.IsWellFormedUriString(location, UriKind.Absolute))
+            {
+                request2.WithUri(location);
+            }
+            else
+            {
+                request2.WithPath(location);
+            }
+
+            await this._client.MakeRequestAsync(request2.Build(), cancellationToken).ConfigureAwait(false);
         }
 
         public Task<ResumableUploadResponse> InitiateBlobUploadAsync(
