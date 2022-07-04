@@ -26,12 +26,12 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - name: 'Checkout'
-      uses: actions/checkout@v2.4.2
+      uses: actions/checkout@7884fcad6b5d53d10323aee724dc68d8b9096a2e # tag=v2.4.2
       with:
         lfs: true
         fetch-depth: 0
     - name: 'Install .NET Core SDK'
-      uses: actions/setup-dotnet@v1.9.1
+      uses: actions/setup-dotnet@608ee757cfcce72c2e91e99aca128e0cae67de87 # tag=v1.9.1
       with:
         include-prerelease: true
     - name: 'Dotnet Tool Restore'
@@ -50,7 +50,7 @@ jobs:
       run: dotnet cake --target=Pack
       shell: pwsh
     - name: 'Publish Artifacts'
-      uses: actions/upload-artifact@v2.3.1
+      uses: actions/upload-artifact@82c141cc518b40d92cc801eee768e7aafc9c2fa2 # tag=v2.3.1
       with:
         name: 'artifacts'
         path: './Artifacts'
@@ -67,7 +67,7 @@ jobs:
     runs-on: windows-latest
     steps:
       - name: 'Download Artifact'
-        uses: actions/download-artifact@v2
+        uses: actions/download-artifact@f023be2c48cc18debc3bacd34cb396e0295e2869 # tag=v2
         with:
           name: 'artifacts'
       - name: 'Dotnet NuGet Add Source'
@@ -87,7 +87,7 @@ jobs:
     runs-on: windows-latest
     steps:
       - name: 'Download Artifact'
-        uses: actions/download-artifact@v2
+        uses: actions/download-artifact@f023be2c48cc18debc3bacd34cb396e0295e2869 # tag=v2
         with:
           name: 'artifacts'
       - name: 'Dotnet NuGet Push'
